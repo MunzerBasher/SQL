@@ -1,0 +1,241 @@
+
+
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE NAME = 'LIBRARY_DATABASE')
+	BEGIN 
+		CREATE DATABASE LIBRARY_DATABASE
+	END
+
+
+USE LIBRARY_DATABASE
+
+
+--CREATE TABLE Persons
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	NAME NVARCHAR(50) NOT NULL,
+--	AGE INT NOT NULL,
+--	LOCATION NVARCHAR(50) NOT NULL,
+--	PHONE1 INT NOT NULL,
+--	PHONE2 INT
+
+--)
+--ALTER TABLE Persons
+--	ADD CONSTRAINT CH_PH CHECK (PHONE1 IS NOT NULL)
+
+
+--INSERT INTO Persons
+--	VALUES
+--	('MUNZER',21, 'EL OBAID',189283,NULL),
+--	('MOHAMED',25, 'GAZE',186348,NULL),
+--	('ALI',32, 'SUDIA',12030494,NULL),
+--	('HALID',51, 'EL OBAID',1638393,NULL),
+--	('MUNZER',21, 'BARA',14038383,NULL)
+
+
+
+SELECT * FROM Persons
+
+
+--CREATE TABLE Managers
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	SALARY INT,
+--	MANAGER_BY INT,
+--	PersonID INT
+--)
+
+SELECT * FROM Managers
+
+
+
+
+
+
+
+--UPDATE Managers
+--	SET MANAGER_BY = 1
+--	WHERE ID <> 1
+
+
+
+
+--CREATE TABLE Clients
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	Client_Code NVARCHAR(2),
+--	PersonID INT
+--)
+
+--ALTER TABLE Clients
+--	ALTER COLUMN Client_Code NVARCHAR(20)
+
+SELECT * FROM Clients
+
+--INSERT INTO Clients
+--	VALUES 
+--	('C_190', 3),
+--	('C_120', 5)
+
+
+--CREATE TABLE Books
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	NAME NVARCHAR(50),
+--	TITEL NVARCHAR(50),
+--	TYPE NVARCHAR(50)
+--)
+
+SELECT * FROM Books
+
+--CREATE TABLE Authors
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	NAME NVARCHAR(50),
+--	LOCTION NVARCHAR(50)
+--)
+
+SELECT * FROM   Authors
+
+--CREATE TABLE WRITTING_BY
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	DATE NVARCHAR(50),
+--	BOOKID INT NOT NULL,
+--	AUTHORID INT NOT NULL
+--)
+--ALTER TABLE WRITTING_BY
+--	ADD FOREIGN KEY (BOOKID) REFERENCES Books(ID)
+
+--ALTER TABLE WRITTING_BY
+--	ADD FOREIGN KEY (AUTHORID) REFERENCES Authors(ID)
+
+
+SELECT * FROM WRITTING_BY
+
+
+	
+--CREATE TABLE Marketings
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	BUY_DATE NVARCHAR(50) NOT NULL,
+--	QUANTITY INT,
+--	MONEY_ INT,
+--	BOOKID INT NOT NULL,
+--	ClientID  NOT NULL,
+--	MANAGERID INT NOT NULL,
+	
+--)
+
+--ALTER TABLE Marketings
+--	ADD FOREIGN KEY (BOOKID) REFERENCES Books(ID)
+
+--ALTER TABLE Marketings
+--	ADD FOREIGN KEY (MANAGERID) REFERENCES Managers(ID)
+ALTER TABLE Marketings
+		ADD ClientID INT  NOT NULL
+ALTER TABLE Marketings
+	ADD FOREIGN KEY (ClientID) REFERENCES Clients(ID)
+
+
+SELECT * FROM Marketings
+
+
+
+
+--CREATE TABLE Loaning
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	Loaning_DATE NVARCHAR(50) NOT NULL,
+--	QUANTITY INT NOT NULL,
+--	MONEY_ INT NOT NULL,
+--	BOOKID INT NOT NULL,
+--	MANAGERID INT NOT NULL,
+	
+--)
+
+--ALTER TABLE Loaning
+--	ADD FOREIGN KEY (BOOKID) REFERENCES Books(ID)
+
+--ALTER TABLE Loaning
+--	ADD FOREIGN KEY (MANAGERID) REFERENCES Managers(ID)
+
+
+
+
+
+
+
+SELECT * FROM Loaning
+
+--exec sp_rename 'Loaning.AUTHORID', 'MANAGERID', AUTHORID;
+
+--exec sp_rename ' Marketings.AUTHORID', 'MANAGERID', AUTHORID;
+
+
+
+--CREATE TABLE Holds_and_Reservations 
+--(
+--	ID INT PRIMARY KEY IDENTITY(1,1),
+--	BOOKID INT NOT NULL,
+--	MANAGERID INT NOT NULL,
+--	ClientID INT NOT NULL,
+--	GIGEN_DATE NVARCHAR(20) NOT NULL,
+--	END_DATE NVARCHAR(20) NOT NULL
+--)
+
+--ALTER TABLE Holds_and_Reservations
+--	ADD FOREIGN KEY (BOOKID) REFERENCES Books(ID)
+
+--ALTER TABLE Holds_and_Reservations
+--	ADD FOREIGN KEY (MANAGERID) REFERENCES Managers(ID)
+
+--ALTER TABLE Holds_and_Reservations
+--	ADD FOREIGN KEY (ClientID) REFERENCES Clients(ID)
+
+
+SELECT * FROM Holds_and_Reservations
+
+
+
+
+
+INSERT INTO Books
+	VALUES
+	('THFIRST','R', 'MATH'),
+	('ND','R', 'ARABIC'),
+	('BASIC','M', 'ML'),
+	('START','P', 'PROGRAMMING')
+
+
+SELECT * FROM Books
+
+SELECT * FROM Marketings
+
+
+ALTER TABLE  Marketings
+	ADD FOREIGN KEY (ClientID) REFERENCES Clients(ID)
+
+
+INSERT INTO Marketings
+	VALUES
+	('2023\11\6',2,2000,1,2,1),
+	('2023\12\6',1,200,2,2,2)
+
+
+SELECT Persons.NAME as PersonName, Persons.LOCATION as PersonLocation , Marketings.BUY_DATE, Marketings.QUANTITY, Marketings.MONEY_, 
+Books.NAME as BookName, Books.TYPE as BookType , Managers.ID as ManagerID FROM Marketings INNER JOIN  Clients on Marketings.ID = Clients.ID   
+INNER JOIN Persons on Clients.PersonID = Persons.ID INNER JOIN Managers on Managers.ID = Persons.ID AND Managers.ID = Marketings.MANAGERID
+INNER JOIN Books on Books.ID = Marketings.BOOKID
+	
+
+
+
+
+
+SELECT Persons.NAME, Persons.AGE, Persons.LOCATION, Books.NAME AS Expr1, Books.TITEL, Books.TYPE, Marketings.BUY_DATE, Marketings.QUANTITY, Marketings.MONEY_
+FROM   Books INNER JOIN
+             Clients ON Books.ID = Clients.ID INNER JOIN
+             Marketings ON Books.ID = Marketings.BOOKID AND Clients.ID = Marketings.ClientID AND Clients.ID = Marketings.ClientID INNER JOIN
+             Persons ON Books.ID = Persons.ID INNER JOIN
+             Managers ON Marketings.MANAGERID = Managers.ID AND Persons.ID = Managers.PersonID
+
